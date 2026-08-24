@@ -1,0 +1,738 @@
+﻿@model IEnumerable<J7Journal.Models.TradeEntry>
+@{
+    ViewBag.Title = "Dashboard";
+    var totalTrades = ViewBag.TotalTrades ?? 0;
+    var winRate = ViewBag.WinRate ?? 0;
+    var totalPnL = ViewBag.TotalPnL ?? 0;
+    var avgPnL = ViewBag.AvgPnL ?? 0;
+}
+
+<div class="fade-in-up">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6 fw-bold mb-1">Dashboard</h1>
+            <p class="text-secondary m-0" style="font-size: 0.95rem;">
+                <i class="fas fa-calendar-alt me-1" style="font-size: 0.8rem;"></i>
+                @DateTime.Now.ToString("dddd, MMMM d, yyyy")
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-primary-custom" onclick="openCreateModal()">
+                <i class="fas fa-plus me-2"></i>New Trade
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(79, 140, 247, 0.15); color: var(--accent-blue);">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="stat-label">Total Trades</div>
+                <div class="stat-value">@totalTrades</div>
+                <div class="stat-change @(totalTrades > 0 ? "positive" : "")">
+                    <i class="fas fa-@(totalTrades > 0 ? "arrow-up" : "minus") me-1"></i>
+                    @totalTrades total
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(46, 204, 113, 0.15); color: var(--accent-green);">
+                    <i class="fas fa-percent"></i>
+                </div>
+                <div class="stat-label">Win Rate</div>
+                <div class="stat-value">@winRate%</div>
+                <div class="stat-change @(winRate >= 50 ? "positive" : "negative")">
+                    <i class="fas fa-@(winRate >= 50 ? "arrow-up" : "arrow-down") me-1"></i>
+                    @(winRate >= 50 ? "Above" : "Below") average
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(241, 196, 15, 0.15); color: var(--accent-gold);">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-label">Total P&L</div>
+                <div class="stat-value @(totalPnL >= 0 ? "text-profit" : "text-loss")">
+                    @(totalPnL >= 0 ? "+" : "")$@totalPnL.ToString("F2")
+                </div>
+                <div class="stat-change @(totalPnL >= 0 ? "positive" : "negative")">
+                    <i class="fas fa-@(totalPnL >= 0 ? "arrow-up" : "arrow-down") me-1"></i>
+                    @(totalPnL >= 0 ? "Profitable" : "Loss")
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(108, 92, 231, 0.15); color: #6c5ce7;">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="stat-label">Average P&L</div>
+                <div class="stat-value @(avgPnL >= 0 ? "text-profit" : "text-loss")">
+                    @(avgPnL >= 0 ? "+" : "")$@avgPnL.ToString("F2")
+                </div>
+                <div class="stat-change @(avgPnL >= 0 ? "positive" : "negative")">
+                    <i class="fas fa-@(avgPnL >= 0 ? "arrow-up" : "arrow-down") me-1"></i>
+                    per trade
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Price Feed -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card-glass">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fas fa-bolt me-2" style="color: var(--accent-gold);"></i>Live Market Prices
+                    </span>
+                    <span class="text-secondary" style="font-size: 0.7rem;">
+                        <i class="fas fa-circle text-success me-1" style="font-size: 0.5rem; animation: pulse-dot 1.5s ease-in-out infinite;"></i>
+                        Live
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- XAUUSD (Gold) -->
+                        <div class="col-md-4">
+                            <div class="price-card" data-symbol="XAUUSD">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <div class="price-label">
+                                            <i class="fas fa-coins me-1" style="color: var(--accent-gold);"></i>Gold
+                                        </div>
+                                        <div class="price-symbol">XAU/USD</div>
+                                    </div>
+                                    <div class="price-change-badge" id="change-XAUUSD">
+                                        <span class="badge bg-secondary">+0.00%</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="price-value" id="price-XAUUSD">$0.00</div>
+                                        <div class="price-change-dollar" id="changeDollar-XAUUSD" style="font-size: 0.8rem;">$0.00</div>
+                                    </div>
+                                    <div class="price-sparkline" id="sparkline-XAUUSD">
+                                        <span class="text-muted" style="font-size: 0.7rem;">--</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 g-1">
+                                    <div class="col-6">
+                                        <div class="price-range" id="range-XAUUSD" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            H: $0.00 | L: $0.00
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <div class="price-open" id="open-XAUUSD" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            Open: $0.00
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="price-volume" id="volume-XAUUSD" style="font-size: 0.6rem; color: var(--text-muted); margin-top: 4px;">
+                                    Vol: 0
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- US100 (NASDAQ 100) -->
+                        <div class="col-md-4">
+                            <div class="price-card" data-symbol="US100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <div class="price-label">
+                                            <i class="fas fa-chart-simple me-1" style="color: var(--accent-blue);"></i>NASDAQ 100
+                                        </div>
+                                        <div class="price-symbol">US100</div>
+                                    </div>
+                                    <div class="price-change-badge" id="change-US100">
+                                        <span class="badge bg-secondary">+0.00%</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="price-value" id="price-US100">$0.00</div>
+                                        <div class="price-change-dollar" id="changeDollar-US100" style="font-size: 0.8rem;">$0.00</div>
+                                    </div>
+                                    <div class="price-sparkline" id="sparkline-US100">
+                                        <span class="text-muted" style="font-size: 0.7rem;">--</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 g-1">
+                                    <div class="col-6">
+                                        <div class="price-range" id="range-US100" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            H: $0.00 | L: $0.00
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <div class="price-open" id="open-US100" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            Open: $0.00
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="price-volume" id="volume-US100" style="font-size: 0.6rem; color: var(--text-muted); margin-top: 4px;">
+                                    Vol: 0
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- US500 (S&P 500) -->
+                        <div class="col-md-4">
+                            <div class="price-card" data-symbol="US500">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <div class="price-label">
+                                            <i class="fas fa-chart-simple me-1" style="color: #6c5ce7;"></i>S&P 500
+                                        </div>
+                                        <div class="price-symbol">US500</div>
+                                    </div>
+                                    <div class="price-change-badge" id="change-US500">
+                                        <span class="badge bg-secondary">+0.00%</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <div class="price-value" id="price-US500">$0.00</div>
+                                        <div class="price-change-dollar" id="changeDollar-US500" style="font-size: 0.8rem;">$0.00</div>
+                                    </div>
+                                    <div class="price-sparkline" id="sparkline-US500">
+                                        <span class="text-muted" style="font-size: 0.7rem;">--</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2 g-1">
+                                    <div class="col-6">
+                                        <div class="price-range" id="range-US500" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            H: $0.00 | L: $0.00
+                                        </div>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <div class="price-open" id="open-US500" style="font-size: 0.65rem; color: var(--text-muted);">
+                                            Open: $0.00
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="price-volume" id="volume-US500" style="font-size: 0.6rem; color: var(--text-muted); margin-top: 4px;">
+                                    Vol: 0
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Cards Grid -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">
+                    <i class="fas fa-clock me-2" style="color: var(--accent-blue);"></i>Recent Trades
+                </h5>
+                <span class="text-secondary" style="font-size: 0.85rem;">
+                    @Model.Count() entries
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h5 class="text-secondary">No trades yet</h5>
+            <p class="text-muted" style="font-size: 0.9rem;">Start tracking your trades by clicking the "New Trade" button above.</p>
+            <button class="btn btn-primary-custom mt-2" onclick="openCreateModal()">
+                <i class="fas fa-plus me-2"></i>Add Your First Trade
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var trade in Model)
+            {
+                var pl = trade.ProfitLoss ?? 0;
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card trade-card h-100" onclick="viewTrade(@trade.Id)" style="cursor: pointer;">
+                        <!-- Screenshot Hero Image -->
+                        <div class="card-img-top trade-screenshot" style="height: 180px; background: var(--bg-secondary); overflow: hidden; position: relative;">
+                            @if (trade.ScreenshotData != null && trade.ScreenshotData.Length > 0)
+                            {
+                                <img src="@Url.Action("GetImage", "Trades", new { id = trade.Id })"
+                                     alt="Trade screenshot"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center h-100" style="background: var(--bg-secondary);">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-image fa-3x mb-2" style="opacity: 0.3;"></i>
+                                        <br />
+                                        <span style="font-size: 0.75rem;">No screenshot</span>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- P&L Badge -->
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge @(pl >= 0 ? "bg-success" : "bg-danger")" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
+                                    @(pl >= 0 ? "+" : "")$@pl.ToString("F2")
+                                </span>
+                            </div>
+
+                            <!-- Direction Badge -->
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge @(trade.Direction == "LONG" ? "bg-success" : "bg-danger")" style="font-size: 0.7rem; padding: 0.25rem 0.6rem;">
+                                    <i class="fas fa-@(trade.Direction == "LONG" ? "arrow-up" : "arrow-down") me-1"></i>
+                                    @trade.Direction
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Symbol & Date -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0" style="font-size: 1rem;">
+                                    @trade.Symbol
+                                    <span class="badge bg-secondary ms-1" style="font-size: 0.6rem; padding: 0.2rem 0.5rem;">
+                                        @trade.SetupType
+                                    </span>
+                                </h6>
+                                <span style="font-size: 0.65rem; color: var(--text-muted);">
+                                    @trade.TradeDate.ToString("MMM dd")
+                                </span>
+                            </div>
+
+                            <!-- Entry/Exit Prices -->
+                            <div class="d-flex justify-content-between mb-2" style="font-size: 0.8rem;">
+                                <span style="color: var(--text-secondary);">
+                                    <i class="fas fa-arrow-right me-1" style="font-size: 0.6rem;"></i>
+                                    Entry: <span style="color: var(--text-primary); font-weight: 500;">@trade.EntryPrice.ToString("F2")</span>
+                                </span>
+                                <span style="color: var(--text-secondary);">
+                                    Exit: <span style="color: var(--text-primary); font-weight: 500;">@trade.ExitPrice.ToString("F2")</span>
+                                </span>
+                            </div>
+
+                            <!-- Tags -->
+                            @if (trade.TradeTags != null && trade.TradeTags.Any())
+                            {
+                                <div class="mb-2">
+                                    @foreach (var tt in trade.TradeTags.Take(3))
+                                    {
+                                        <span class="tag-pill" style="background: @tt.Tag.Color; color: white; border: none; padding: 0.1rem 0.6rem; font-size: 0.6rem; margin: 0.1rem;">
+                                            @tt.Tag.Name
+                                        </span>
+                                    }
+                                    @if (trade.TradeTags.Count > 3)
+                                    {
+                                        <span class="tag-pill" style="background: var(--bg-card); border: 1px solid var(--border-color); font-size: 0.6rem; padding: 0.1rem 0.5rem;">
+                                            +@(trade.TradeTags.Count - 3)
+                                        </span>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Rating Stars -->
+                            @if (trade.Rating.HasValue)
+                            {
+                                <div class="mb-2" style="font-size: 0.7rem;">
+                                    @for (int i = 1; i <= trade.Rating.Value; i++)
+                                    {
+                                        <i class="fas fa-star" style="color: var(--accent-gold);"></i>
+                                    }
+                                    @for (int i = trade.Rating.Value + 1; i <= 5; i++)
+                                    {
+                                        <i class="far fa-star" style="color: var(--text-muted);"></i>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Reason for Entry (truncated) -->
+                            @if (!string.IsNullOrEmpty(trade.ReasonForEntry))
+                            {
+                                <p class="text-secondary mb-2" style="font-size: 0.7rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @trade.ReasonForEntry
+                                </p>
+                            }
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center pt-0">
+                            <div>
+                                @if (!string.IsNullOrEmpty(trade.DailyBias))
+                                {
+                                    <span class="badge" style="background: rgba(79, 140, 247, 0.15); color: var(--accent-blue); font-size: 0.6rem; padding: 0.2rem 0.5rem;">
+                                        @trade.DailyBias
+                                    </span>
+                                }
+                            </div>
+                            <div class="d-flex gap-1" onclick="event.stopPropagation();">
+                                <button class="action-btn" onclick="editTrade(@trade.Id)" title="Edit">
+                                    <i class="fas fa-pen" style="font-size: 0.8rem;"></i>
+                                </button>
+                                <button class="action-btn danger" onclick="deleteTrade(@trade.Id)" title="Delete">
+                                    <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Trade Modal -->
+<div class="modal fade" id="tradeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content modal-content-custom">
+            <div class="modal-body p-0" id="tradeModalContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3">Loading trade details...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .price-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .price-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        opacity: 0.5;
+        transition: var(--transition);
+    }
+
+    .price-card[data-symbol="XAUUSD"]::before {
+        background: var(--accent-gold);
+    }
+
+    .price-card[data-symbol="US100"]::before {
+        background: var(--accent-blue);
+    }
+
+    .price-card[data-symbol="US500"]::before {
+        background: #6c5ce7;
+    }
+
+    .price-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(79, 140, 247, 0.3);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    [data-bs-theme="light"] .price-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+
+    .price-card .price-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .price-card .price-symbol {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 400;
+        margin-top: -2px;
+    }
+
+    .price-card .price-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        transition: color 0.3s ease;
+    }
+
+    .price-card .price-value.up {
+        color: var(--accent-green) !important;
+    }
+
+    .price-card .price-value.down {
+        color: var(--accent-red) !important;
+    }
+
+    .price-card .price-change-badge .badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.6rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .price-card .price-change-badge .badge.positive {
+        background: rgba(46, 204, 113, 0.2) !important;
+        color: var(--accent-green) !important;
+    }
+
+    .price-card .price-change-badge .badge.negative {
+        background: rgba(231, 76, 60, 0.2) !important;
+        color: var(--accent-red) !important;
+    }
+
+    .price-card .price-change-dollar {
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .price-card .price-range {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+    }
+
+    .price-card .price-open {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+    }
+
+    .price-card .price-volume {
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+
+    .price-card .price-sparkline {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* Price update flash animation */
+    keyframes price-flash-up {
+        0% { background: rgba(46, 204, 113, 0.15); }
+        100% { background: transparent; }
+    }
+
+    keyframes price-flash-down {
+        0% { background: rgba(231, 76, 60, 0.15); }
+        100% { background: transparent; }
+    }
+
+    .price-card.flash-up {
+        animation: price-flash-up 0.5s ease;
+    }
+
+    .price-card.flash-down {
+        animation: price-flash-down 0.5s ease;
+    }
+
+    .trade-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        transition: var(--transition);
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .trade-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(79, 140, 247, 0.3);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    [data-bs-theme="light"] .trade-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+
+    .trade-card .card-footer {
+        padding: 0.75rem 1rem 1rem 1rem;
+    }
+
+    .trade-card .card-body {
+        padding: 1rem;
+    }
+
+    .trade-screenshot {
+        position: relative;
+        background: var(--bg-secondary);
+    }
+
+    .trade-screenshot img {
+        transition: var(--transition);
+    }
+
+    .trade-card:hover .trade-screenshot img {
+        transform: scale(1.02);
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        z-index: 10;
+    }
+
+    .action-btn:hover {
+        background: rgba(79, 140, 247, 0.1);
+        color: var(--accent-blue);
+    }
+
+    .action-btn.danger:hover {
+        background: rgba(231, 76, 60, 0.1);
+        color: var(--accent-red);
+    }
+</style>
+
+@section scripts {
+    <script>
+        var isSubmitting = false;
+
+        function openCreateModal() {
+            $('#tradeModalContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3">Loading form...</p>
+                </div>
+            `);
+            $('#tradeModal').modal('show');
+            $.get('@Url.Action("Create", "Trades")', function(data) {
+                $('#tradeModalContent').html(data);
+            });
+        }
+
+        function viewTrade(id) {
+            $('#tradeModalContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3">Loading trade details...</p>
+                </div>
+            `);
+            $('#tradeModal').modal('show');
+            $.get('@Url.Action("Details", "Trades")?id=' + id, function(data) {
+                $('#tradeModalContent').html(data);
+            });
+        }
+
+        function editTrade(id) {
+            event.stopPropagation();
+            $('#tradeModalContent').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3">Loading edit form...</p>
+                </div>
+            `);
+            $('#tradeModal').modal('show');
+            $.get('@Url.Action("Edit", "Trades")?id=' + id, function(data) {
+                $('#tradeModalContent').html(data);
+            });
+        }
+
+        function deleteTrade(id) {
+            event.stopPropagation();
+            if (confirm('Are you sure you want to delete this trade?')) {
+                $.post('@Url.Action("Delete", "Trades")?id=' + id, function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting trade.');
+                    }
+                });
+            }
+        }
+
+        $(document).off('submit', '#tradeForm').on('submit', '#tradeForm', function(e) {
+            e.preventDefault();
+
+            if (isSubmitting) {
+                return false;
+            }
+
+            var form = $(this);
+            var formData = new FormData(this);
+
+            var symbol = $('select[name="Trade.Symbol"]').val();
+            var direction = $('input[name="Trade.Direction"]:checked').val();
+            var entry = $('input[name="Trade.EntryPrice"]').val();
+            var exit = $('input[name="Trade.ExitPrice"]').val();
+
+            if (!symbol) { alert('Please select a Symbol.'); return false; }
+            if (!direction) { alert('Please select a Direction.'); return false; }
+            if (!entry || parseFloat(entry) <= 0) { alert('Please enter a valid Entry Price.'); return false; }
+            if (!exit || parseFloat(exit) <= 0) { alert('Please enter a valid Exit Price.'); return false; }
+
+            isSubmitting = true;
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
+                    $('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        isSubmitting = false;
+                        $('#tradeModal').modal('hide');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        isSubmitting = false;
+                        alert('Error: ' + (response.message || 'Please check your inputs.'));
+                        $('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Save Trade');
+                    }
+                },
+                error: function() {
+                    isSubmitting = false;
+                    alert('Error saving trade. Please try again.');
+                    $('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Save Trade');
+                }
+            });
+
+            return false;
+        });
+
+        $(document).on('hidden.bs.modal', '#tradeModal', function() {
+            isSubmitting = false;
+        });
+    </script>
+}

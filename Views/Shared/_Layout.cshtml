@@ -1,0 +1,667 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - J7 Journal</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 Dark Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111927;
+            --bg-card: #1a2332;
+            --bg-card-hover: #1f2b3f;
+            --border-color: #2a3a52;
+            --text-primary: #e8edf5;
+            --text-secondary: #8899aa;
+            --text-muted: #5a6b7e;
+            --accent-blue: #4f8cf7;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --accent-gold: #f1c40f;
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-bs-theme="light"] {
+            --bg-primary: #f0f2f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8f9fa;
+            --border-color: #e0e4e8;
+            --text-primary: #1a2332;
+            --text-secondary: #5a6b7e;
+            --text-muted: #8899aa;
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background: rgba(17, 25, 39, 0.85) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        [data-bs-theme="light"] .navbar-custom {
+            background: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-blue), #6c5ce7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-custom .navbar-brand i {
+            -webkit-text-fill-color: var(--accent-blue);
+            background: none;
+        }
+
+        .navbar-custom .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+            color: var(--text-primary) !important;
+            background: rgba(79, 140, 247, 0.1);
+        }
+
+        .navbar-custom .nav-link i {
+            margin-right: 8px;
+            font-size: 0.85rem;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            background: rgba(79, 140, 247, 0.1);
+        }
+
+        /* Cards */
+        .card-glass {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .card-glass:hover {
+            border-color: rgba(79, 140, 247, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+
+        [data-bs-theme="light"] .card-glass:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-glass .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .card-glass .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), #6c5ce7);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(79, 140, 247, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        [data-bs-theme="light"] .stat-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-top: 0.25rem;
+        }
+
+        .stat-card .stat-change {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card .stat-change.positive {
+            color: var(--accent-green);
+            background: rgba(46, 204, 113, 0.15);
+        }
+
+        .stat-card .stat-change.negative {
+            color: var(--accent-red);
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--accent-blue), #5a7cf7);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(79, 140, 247, 0.3);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 140, 247, 0.4);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            background: rgba(79, 140, 247, 0.05);
+        }
+
+        /* Tables */
+        .table-custom {
+            color: var(--text-primary);
+            border-collapse: separate;
+            border-spacing: 0 6px;
+        }
+
+        .table-custom thead th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 0.75rem 1rem;
+            background: transparent;
+        }
+
+        .table-custom tbody tr {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .table-custom tbody tr:hover {
+            background: var(--bg-card-hover);
+            transform: scale(1.01);
+        }
+
+        .table-custom tbody td {
+            padding: 0.9rem 1rem;
+            border: none;
+            vertical-align: middle;
+        }
+
+        .table-custom tbody td:first-child {
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+        }
+
+        .table-custom tbody td:last-child {
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* Badges */
+        .badge-custom {
+            padding: 0.35rem 0.85rem;
+            font-weight: 600;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-long {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .badge-short {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--accent-red);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(79, 140, 247, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent-red);
+        }
+
+        /* Modal */
+        .modal-content-custom {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        }
+
+        .modal-content-custom .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-content-custom .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-content-custom .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-control-custom {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control-custom:focus {
+            background: var(--bg-primary);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.15);
+        }
+
+        .form-control-custom::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label-custom {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+        }
+
+        /* Tags */
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin: 0.15rem;
+        }
+
+        .tag-pill .tag-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Profit/Loss Colors */
+        .text-profit {
+            color: var(--accent-green) !important;
+        }
+        .text-loss {
+            color: var(--accent-red) !important;
+        }
+
+        /* Animations */
+        keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* Trade Cards */
+        .trade-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .trade-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79, 140, 247, 0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        [data-bs-theme="light"] .trade-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .trade-card .card-footer {
+            padding: 0.75rem 1rem 1rem 1rem;
+        }
+
+        .trade-card .card-body {
+            padding: 1rem;
+        }
+
+        .trade-screenshot {
+            position: relative;
+            background: var(--bg-secondary);
+        }
+
+        .trade-screenshot img {
+            transition: var(--transition);
+        }
+
+        .trade-card:hover .trade-screenshot img {
+            transform: scale(1.02);
+        }
+
+        /* Price Feed Cards */
+        .price-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .price-card:hover {
+            border-color: rgba(79, 140, 247, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .price-card .price-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .price-card .price-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+
+        .price-card .price-value.up {
+            color: var(--accent-green);
+        }
+
+        .price-card .price-value.down {
+            color: var(--accent-red);
+        }
+
+        /* Responsive */
+        media (max-width: 768px) {
+            .stat-card .stat-value {
+                font-size: 1.25rem;
+            }
+            .table-custom {
+                font-size: 0.8rem;
+            }
+            .table-custom tbody td {
+                padding: 0.6rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">
+                <i class="fas fa-chart-line me-2"></i>J7 Journal
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                           href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-gauge-high"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Analytics" ? "active" : "")"
+                           href="@Url.Action("Index", "Analytics")">
+                            <i class="fas fa-chart-pie"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-4">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SignalR Scripts -->
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <!-- Price Feed -->
+    <script src="~/Scripts/price-feed.js"></script>
+
+    <script>
+        // Theme Toggle with localStorage
+        (function () {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const html = document.documentElement;
+
+            // Check saved theme
+            const savedTheme = localStorage.getItem('j7-theme');
+            if (savedTheme) {
+                html.setAttribute('data-bs-theme', savedTheme);
+                updateIcon(savedTheme);
+            }
+
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = html.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('j7-theme', newTheme);
+                updateIcon(newTheme);
+            });
+
+            function updateIcon(theme) {
+                if (theme === 'dark') {
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    themeIcon.className = 'fas fa-sun';
+                }
+            }
+        })();
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

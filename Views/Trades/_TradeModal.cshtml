@@ -1,0 +1,289 @@
+﻿@model J7Journal.Models.TradeViewModel
+@{
+    var trade = Model.Trade;
+    var pl = trade.ProfitLoss ?? 0;
+    var isProfitable = pl >= 0;
+}
+
+<div class="modal-content-custom">
+    <!-- Modal Header -->
+    <div class="modal-header">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge-custom @(isProfitable ? "badge-long" : "badge-short")" style="font-size: 0.8rem; padding: 0.4rem 1rem;">
+                    <i class="fas @(isProfitable ? "fa-arrow-up" : "fa-arrow-down") me-1"></i>
+                    @(isProfitable ? "WIN" : "LOSS")
+                </span>
+                <h5 class="modal-title fw-bold">
+                    @trade.Symbol
+                    <span class="badge-custom @(trade.Direction == "LONG" ? "badge-long" : "badge-short") ms-2">
+                        @trade.Direction
+                    </span>
+                </h5>
+            </div>
+            <p class="text-secondary m-0" style="font-size: 0.8rem;">
+                <i class="far fa-calendar-alt me-1"></i>
+                @trade.TradeDate.ToString("dddd, MMMM d, yyyy • h:mm tt")
+                <span class="mx-2">|</span>
+                <i class="far fa-clock me-1"></i>
+                @((DateTime.Now - trade.TradeDate).Days) days ago
+            </p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+        <!-- Screenshot Hero -->
+        @if (trade.ScreenshotData != null && trade.ScreenshotData.Length > 0)
+        {
+            <div class="mb-4" style="border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-color);">
+                <img src="@Url.Action("GetImage", "Trades", new { id = trade.Id })"
+                     alt="Trade screenshot"
+                     class="img-fluid w-100"
+                     style="max-height: 400px; object-fit: contain; background: var(--bg-primary);" />
+            </div>
+        }
+        else
+        {
+            <div class="mb-4 text-center py-4" style="border-radius: var(--radius); border: 1px dashed var(--border-color); background: var(--bg-primary);">
+                <i class="fas fa-image" style="font-size: 2.5rem; color: var(--text-muted);"></i>
+                <p class="text-muted mt-2" style="font-size: 0.9rem;">No screenshot attached</p>
+            </div>
+        }
+
+        <!-- Stats Grid -->
+        <div class="row g-3 mb-4">
+            <!-- P&L -->
+            <div class="col-md-3">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-dollar-sign me-1"></i> P&L
+                    </div>
+                    <div class="fw-bold @(isProfitable ? "text-profit" : "text-loss")" style="font-size: 1.5rem;">
+                        @(isProfitable ? "+" : "")$@pl.ToString("F2")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entry/Exit -->
+            <div class="col-md-3">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-arrows-alt-h me-1"></i> Entry → Exit
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 600;">
+                        @trade.EntryPrice.ToString("F2")
+                        <i class="fas fa-arrow-right mx-2" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                        @trade.ExitPrice.ToString("F2")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Setup -->
+            <div class="col-md-3">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-layer-group me-1"></i> Setup
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 600;">
+                        @(trade.SetupType ?? "—")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="col-md-3">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-star me-1"></i> Rating
+                    </div>
+                    <div style="font-size: 1.1rem;">
+                        @if (trade.Rating.HasValue)
+                        {
+                            for (int i = 1; i <= trade.Rating.Value; i++)
+                            {
+                                <i class="fas fa-star text-warning" style="font-size: 1.1rem;"></i>
+                            }
+                            for (int i = trade.Rating.Value + 1; i <= 5; i++)
+                            {
+                                <i class="far fa-star text-secondary" style="font-size: 1.1rem;"></i>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-secondary">Not rated</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="row g-3">
+
+            <!-- Tags -->
+            @if (trade.TradeTags != null && trade.TradeTags.Any())
+            {
+                <div class="col-12">
+                    <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                        <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                            <i class="fas fa-tags me-1"></i> Tags
+                        </div>
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var tt in trade.TradeTags)
+                            {
+                                <span class="tag-pill" style="background: @tt.Tag.Color; color: white; border: none; padding: 0.2rem 0.8rem;">
+                                    @tt.Tag.Name
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Daily Bias & HTF Liquidity -->
+            <div class="col-md-6">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary); height: 100%;">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-compass me-1"></i> Daily Bias
+                    </div>
+                    <div style="font-weight: 500; margin-top: 0.25rem;">
+                        @if (!string.IsNullOrEmpty(trade.DailyBias))
+                        {
+                            <span class="badge-custom @(trade.DailyBias == "Bullish" ? "badge-long" : trade.DailyBias == "Bearish" ? "badge-short" : "")">
+                                @trade.DailyBias
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-secondary">Not specified</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary); height: 100%;">
+                    <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fas fa-water me-1"></i> HTF Liquidity
+                    </div>
+                    <div style="font-weight: 500; margin-top: 0.25rem;">
+                        @(!string.IsNullOrEmpty(trade.HTFLiquidity) ? trade.HTFLiquidity : "—")
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confluences -->
+            @if (!string.IsNullOrEmpty(trade.Confluences))
+            {
+                <div class="col-12">
+                    <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                        <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-link me-1"></i> Confluences
+                        </div>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            @foreach (var c in trade.Confluences.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <span class="badge" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.2rem 0.7rem; border-radius: 20px; font-weight: 400;">
+                                    @c.Trim()
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Reason for Entry -->
+            @if (!string.IsNullOrEmpty(trade.ReasonForEntry))
+            {
+                <div class="col-12">
+                    <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary);">
+                        <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-lightbulb me-1"></i> Reason for Entry
+                        </div>
+                        <div style="margin-top: 0.25rem; color: var(--text-primary); line-height: 1.6;">
+                            @trade.ReasonForEntry
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Lesson Learned -->
+            @if (!string.IsNullOrEmpty(trade.LessonLearned))
+            {
+                <div class="col-12">
+                    <div class="card-glass" style="padding: 1rem; border: none; background: var(--bg-primary); border-left: 3px solid var(--accent-blue);">
+                        <div class="text-secondary" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <i class="fas fa-graduation-cap me-1"></i> Lesson Learned
+                        </div>
+                        <div style="margin-top: 0.25rem; color: var(--text-primary); line-height: 1.6; font-style: italic;">
+                            "@trade.LessonLearned"
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Metadata -->
+            <div class="col-12">
+                <div class="text-secondary" style="font-size: 0.65rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.5rem;">
+                    <i class="far fa-clock me-1"></i>
+                    Created: @trade.CreatedAt.ToString("MMM d, yyyy • h:mm tt")
+                    @if (trade.UpdatedAt != trade.CreatedAt)
+                    {
+                        <span class="mx-2">|</span>
+                        <i class="fas fa-edit me-1"></i>
+                    Updated: @trade.UpdatedAt.ToString("MMM d, yyyy • h:mm tt");
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Close
+        </button>
+        <button type="button" class="btn btn-outline-secondary" onclick="editTrade(@trade.Id); $('#tradeModal').modal('hide');">
+            <i class="fas fa-pen me-2"></i>Edit
+        </button>
+        <button type="button" class="btn btn-danger" onclick="deleteTrade(@trade.Id); $('#tradeModal').modal('hide');">
+            <i class="fas fa-trash-alt me-2"></i>Delete
+        </button>
+    </div>
+</div>
+
+<script>
+    // Re-define functions if needed
+    if (typeof editTrade === 'undefined') {
+        window.editTrade = function(id) {
+            $.get('@Url.Action("Edit", "Trades")?id=' + id, function(data) {
+                $('#tradeModalContent').html(data);
+                $('#tradeModal').modal('show');
+            });
+        };
+    }
+
+    if (typeof deleteTrade === 'undefined') {
+        window.deleteTrade = function(id) {
+            if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+                $.post('@Url.Action("Delete", "Trades")?id=' + id, function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting trade. Please try again.');
+                    }
+                });
+            }
+        };
+    }
+
+    // Close modal on ESC
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#tradeModal').modal('hide');
+        }
+    });
+</script>

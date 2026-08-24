@@ -1,0 +1,320 @@
+﻿@model J7Journal.Models.TradeViewModel
+@{
+    var isEdit = Model.Trade.Id > 0;
+    var title = isEdit ? "Edit Trade" : "New Trade";
+}
+
+<div class="modal-content-custom">
+    <div class="modal-header">
+        <div>
+            <h5 class="modal-title fw-bold">
+                <i class="fas @(isEdit ? "fa-pen" : "fa-plus-circle") me-2" style="color: var(--accent-blue);"></i>
+                @title
+            </h5>
+            <p class="text-secondary m-0" style="font-size: 0.8rem;">
+                @(isEdit ? "Update your trade details below" : "Log a new trade to track your performance")
+            </p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <div class="modal-body">
+        <form id="tradeForm" action="@Url.Action(isEdit ? "Edit" : "Create", "Trades")" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.Trade.Id)
+            @Html.HiddenFor(m => m.Trade.CreatedAt)
+
+            <div class="row g-3">
+                <!-- LEFT COLUMN -->
+                <div class="col-lg-6">
+                    <div class="card-glass" style="border: none; background: var(--bg-primary);">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3" style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-info-circle me-2" style="color: var(--accent-blue);"></i>Trade Information
+                            </h6>
+
+                            <div class="row g-2">
+                                <!-- Symbol -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Symbol</label>
+                                    <select name="Trade.Symbol" class="form-select form-control-custom" required>
+                                        <option value="">Select Symbol</option>
+                                        <option value="GOLD" @(Model.Trade.Symbol == "GOLD" ? "selected" : "")>GOLD</option>
+                                        <option value="NASDAQ" @(Model.Trade.Symbol == "NASDAQ" ? "selected" : "")>NASDAQ</option>
+                                        <option value="SP500" @(Model.Trade.Symbol == "SP500" ? "selected" : "")>S&P 500</option>
+                                    </select>
+                                </div>
+
+                                <!-- Direction -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Direction</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="Trade.Direction" id="directionLong" value="LONG" @(Model.Trade.Direction == "LONG" ? "checked" : "") required>
+                                        <label class="btn btn-outline-success" for="directionLong" style="border-radius: var(--radius-sm) 0 0 var(--radius-sm);">
+                                            <i class="fas fa-arrow-up me-1"></i> LONG
+                                        </label>
+                                        <input type="radio" class="btn-check" name="Trade.Direction" id="directionShort" value="SHORT" @(Model.Trade.Direction == "SHORT" ? "checked" : "") required>
+                                        <label class="btn btn-outline-danger" for="directionShort" style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+                                            <i class="fas fa-arrow-down me-1"></i> SHORT
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Entry Price -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Entry Price</label>
+                                    <input type="number" step="0.01" name="Trade.EntryPrice" class="form-control form-control-custom" value="@Model.Trade.EntryPrice.ToString("0.00")" required />
+                                </div>
+
+                                <!-- Exit Price -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Exit Price</label>
+                                    <input type="number" step="0.01" name="Trade.ExitPrice" class="form-control form-control-custom" value="@Model.Trade.ExitPrice.ToString("0.00")" required />
+                                </div>
+
+                                <!-- P&L -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">P&L</label>
+                                    <input type="number" step="0.01" name="Trade.ProfitLoss" class="form-control form-control-custom" value="@Model.Trade.ProfitLoss?.ToString(" 0.00")" placeholder="Auto-calculated" />
+                                </div>
+
+                                <!-- Trade Date -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Trade Date</label>
+                                    <input type="datetime-local" name="Trade.TradeDate" class="form-control form-control-custom" value="@Model.Trade.TradeDate.ToString("yyyy-MM-ddTHH:mm")" required />
+                                </div>
+
+                                <!-- Setup Type -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Setup Type</label>
+                                    <select name="Trade.SetupType" class="form-select form-control-custom">
+                                        <option value="">Select Setup</option>
+                                        <option value="Breakout" @(Model.Trade.SetupType == "Breakout" ? "selected" : "")>Breakout</option>
+                                        <option value="Pullback" @(Model.Trade.SetupType == "Pullback" ? "selected" : "")>Pullback</option>
+                                        <option value="Reversal" @(Model.Trade.SetupType == "Reversal" ? "selected" : "")>Reversal</option>
+                                        <option value="Scalp" @(Model.Trade.SetupType == "Scalp" ? "selected" : "")>Scalp</option>
+                                        <option value="Swing" @(Model.Trade.SetupType == "Swing" ? "selected" : "")>Swing</option>
+                                        <option value="Other" @(Model.Trade.SetupType == "Other" ? "selected" : "")>Other</option>
+                                    </select>
+                                </div>
+
+                                <!-- Daily Bias -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Daily Bias</label>
+                                    <select name="Trade.DailyBias" class="form-select form-control-custom">
+                                        <option value="">Select Bias</option>
+                                        <option value="Bullish" @(Model.Trade.DailyBias == "Bullish" ? "selected" : "")>Bullish</option>
+                                        <option value="Bearish" @(Model.Trade.DailyBias == "Bearish" ? "selected" : "")>Bearish</option>
+                                        <option value="Neutral" @(Model.Trade.DailyBias == "Neutral" ? "selected" : "")>Neutral</option>
+                                    </select>
+                                </div>
+
+                                <!-- HTF Liquidity -->
+                                <div class="col-12">
+                                    <label class="form-label-custom">HTF Liquidity</label>
+                                    <input type="text" name="Trade.HTFLiquidity" class="form-control form-control-custom" value="@Model.Trade.HTFLiquidity" placeholder="e.g., Previous Day High, Weekly Low" />
+                                </div>
+
+                                <!-- Confluences -->
+                                <div class="col-12">
+                                    <label class="form-label-custom">Confluences</label>
+                                    <input type="text" name="Trade.Confluences" class="form-control form-control-custom" value="@Model.Trade.Confluences" placeholder="e.g., Trendline, Fibonacci, FVG" />
+                                    <span class="text-muted" style="font-size: 0.7rem;">Separate with commas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN -->
+                <div class="col-lg-6">
+                    <div class="card-glass" style="border: none; background: var(--bg-primary);">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3" style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                                <i class="fas fa-chart-bar me-2" style="color: var(--accent-blue);"></i>Analysis & Media
+                            </h6>
+
+                            <div class="row g-2">
+                                <!-- Reason for Entry -->
+                                <div class="col-12">
+                                    <label class="form-label-custom">Reason for Entry</label>
+                                    <textarea name="Trade.ReasonForEntry" class="form-control form-control-custom" rows="2" placeholder="Why did you take this trade?">@Model.Trade.ReasonForEntry</textarea>
+                                </div>
+
+                                <!-- Lesson Learned -->
+                                <div class="col-12">
+                                    <label class="form-label-custom">Lesson Learned</label>
+                                    <textarea name="Trade.LessonLearned" class="form-control form-control-custom" rows="2" placeholder="What did you learn from this trade?">@Model.Trade.LessonLearned</textarea>
+                                </div>
+
+                                <!-- Rating -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Rating</label>
+                                    <div class="d-flex gap-1 rating-input">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <label class="btn btn-outline-warning btn-sm @(Model.Trade.Rating == i ? "active" : "")" style="border-radius: var(--radius-sm); padding: 0.3rem 0.6rem; cursor: pointer;">
+                                                <input type="radio" name="Trade.Rating" value="@i" @(Model.Trade.Rating == i ? "checked" : "") style="display: none;" />
+                                                <i class="fas fa-star @(Model.Trade.Rating >= i ? "text-warning" : "")"></i>
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Tags -->
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Tags</label>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @if (Model.AvailableTags != null && Model.AvailableTags.Any())
+                                        {
+                                            foreach (var tag in Model.AvailableTags)
+                                            {
+                                                var isChecked = Model.SelectedTagIds != null && Model.SelectedTagIds.Contains(tag.Id);
+                                                <label class="tag-pill @(isChecked ? "active" : "")" style="cursor: pointer; @(isChecked ? "background: var(--accent-blue); color: white; border-color: var(--accent-blue);" : "")">
+                                                    <input type="checkbox" name="SelectedTagIds" value="@tag.Id" @(isChecked ? "checked" : "") style="display: none;" />
+                                                    <span class="tag-dot" style="background: @tag.Color;"></span>
+                                                    @tag.Name
+                                                </label>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-secondary" style="font-size: 0.8rem;">No tags available</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Screenshot -->
+                                <div class="col-12">
+                                    <label class="form-label-custom">Screenshot</label>
+                                    <div class="border rounded-3 p-3" style="border-color: var(--border-color) !important; background: var(--bg-primary);">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <label for="screenshotUpload" class="btn btn-outline-custom mb-0" style="cursor: pointer;">
+                                                <i class="fas fa-cloud-upload-alt me-2"></i>Choose File
+                                            </label>
+                                            <input type="file" name="ScreenshotFile" id="screenshotUpload" class="d-none" accept="image/*" />
+                                            <span id="fileName" class="text-secondary" style="font-size: 0.85rem;">No file selected</span>
+                                        </div>
+                                        @if (isEdit && Model.Trade.ScreenshotData != null)
+                                        {
+                                            <div class="mt-3">
+                                                <div class="position-relative" style="display: inline-block;">
+                                                    <img src="@Url.Action("GetImage", "Trades", new { id = Model.Trade.Id })" alt="Current screenshot" style="max-height: 120px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);" />
+                                                    <span class="badge bg-secondary" style="position: absolute; top: 5px; right: 5px; font-size: 0.6rem;">
+                                                        <i class="fas fa-check me-1"></i>Current
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="submit" form="tradeForm" class="btn btn-primary-custom">
+            <i class="fas @(isEdit ? "fa-save" : "fa-plus-circle") me-2"></i>
+            @(isEdit ? "Update Trade" : "Save Trade")
+        </button>
+    </div>
+</div>
+
+<script>
+    // File name display
+    document.getElementById('screenshotUpload')?.addEventListener('change', function (e) {
+        var fileName = e.target.files[0]?.name || 'No file selected';
+        document.getElementById('fileName').textContent = fileName;
+    });
+
+    // Rating click handler
+    document.querySelectorAll('.rating-input .btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var siblings = this.parentElement.querySelectorAll('.btn');
+            siblings.forEach(function (s) { s.classList.remove('active'); });
+            this.classList.add('active');
+            var radio = this.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        });
+    });
+
+    // Tag click handler
+    document.querySelectorAll('.tag-pill').forEach(function (pill) {
+        pill.addEventListener('click', function (e) {
+            e.preventDefault();
+            var checkbox = this.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    this.style.background = 'var(--accent-blue)';
+                    this.style.color = 'white';
+                    this.style.borderColor = 'var(--accent-blue)';
+                    this.classList.add('active');
+                } else {
+                    this.style.background = '';
+                    this.style.color = '';
+                    this.style.borderColor = '';
+                    this.classList.remove('active');
+                }
+            }
+        });
+    });
+
+    // Form submission
+    $(document).on('submit', '#tradeForm', function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var formData = new FormData(this);
+
+        // Validate
+        var symbol = form.find('select[name="Trade.Symbol"]').val();
+        var direction = form.find('input[name="Trade.Direction"]:checked').val();
+        var entry = form.find('input[name="Trade.EntryPrice"]').val();
+        var exit = form.find('input[name="Trade.ExitPrice"]').val();
+
+        if (!symbol) { alert('Please select a Symbol.'); return false; }
+        if (!direction) { alert('Please select a Direction.'); return false; }
+        if (!entry || parseFloat(entry) <= 0) { alert('Please enter a valid Entry Price.'); return false; }
+        if (!exit || parseFloat(exit) <= 0) { alert('Please enter a valid Exit Price.'); return false; }
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                form.find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+            },
+            success: function (response) {
+                if (response.success) {
+                    $('#tradeModal').modal('hide');
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else {
+                    alert('Error: ' + (response.message || 'Please check your inputs.'));
+                    form.find('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Save Trade');
+                }
+            },
+            error: function (xhr) {
+                var errorMsg = 'Error saving trade. Please try again.';
+                if (xhr.responseText) {
+                    try {
+                        var json = JSON.parse(xhr.responseText);
+                        if (json.message) errorMsg = json.message;
+                    } catch (e) { }
+                }
+                alert('Error: ' + errorMsg);
+                form.find('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Save Trade');
+            }
+        });
+    });
+</script>
