@@ -129,6 +129,7 @@ namespace J7Journal.Controllers
                 model.Trade.CreatedAt = DateTime.Now;
                 model.Trade.UpdatedAt = DateTime.Now;
 
+
                 db.TradeEntries.Add(model.Trade);
                 db.SaveChanges();
 
@@ -263,7 +264,7 @@ namespace J7Journal.Controllers
                         db.TradeTags.Add(new TradeTag { TradeId = trade.Id, TagId = tagId });
                     }
                 }
-
+                trade.IsJournalComplete = true;
                 db.SaveChanges();
                 return Json(new { success = true });
             }

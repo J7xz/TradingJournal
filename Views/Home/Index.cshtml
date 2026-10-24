@@ -298,6 +298,23 @@
                         </div>
 
                         <div class="card-body">
+                            <!-- MT5 Badge -->
+                            @if (trade.ImportedFromMT5)
+                            {
+                                <div class="mb-2 d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success" style="font-size: 0.7rem;">
+                                        <i class="fas fa-check-circle me-1"></i> Imported from MT5
+                                    </span>
+
+                                    @if (!trade.IsJournalComplete)
+                                    {
+                                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">
+                                            Needs Notes
+                                        </span>
+                                    }
+                                </div>
+                            }
+
                             <!-- Symbol & Date -->
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h6 class="fw-bold mb-0" style="font-size: 1rem;">
@@ -408,8 +425,15 @@
 
 <style>
     keyframes pulse-dot {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.8); }
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.4;
+            transform: scale(0.8);
+        }
     }
 
     .price-card {
@@ -422,34 +446,34 @@
         overflow: hidden;
     }
 
-    .price-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        opacity: 0.5;
-        transition: var(--transition);
-    }
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0.5;
+            transition: var(--transition);
+        }
 
-    .price-card[data-symbol="XAUUSD"]::before {
-        background: var(--accent-gold);
-    }
+        .price-card[data-symbol="XAUUSD"]::before {
+            background: var(--accent-gold);
+        }
 
-    .price-card[data-symbol="US100"]::before {
-        background: var(--accent-blue);
-    }
+        .price-card[data-symbol="US100"]::before {
+            background: var(--accent-blue);
+        }
 
-    .price-card[data-symbol="US500"]::before {
-        background: #6c5ce7;
-    }
+        .price-card[data-symbol="US500"]::before {
+            background: #6c5ce7;
+        }
 
-    .price-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(79, 140, 247, 0.3);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
+        .price-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79, 140, 247, 0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
 
     [data-bs-theme="light"] .price-card:hover {
         box-shadow: 0 12px 40px rgba(0,0,0,0.12);
@@ -477,13 +501,13 @@
         transition: color 0.3s ease;
     }
 
-    .price-card .price-value.up {
-        color: var(--accent-green) !important;
-    }
+        .price-card .price-value.up {
+            color: var(--accent-green) !important;
+        }
 
-    .price-card .price-value.down {
-        color: var(--accent-red) !important;
-    }
+        .price-card .price-value.down {
+            color: var(--accent-red) !important;
+        }
 
     .price-card .price-change-badge .badge {
         font-size: 0.7rem;
@@ -492,15 +516,15 @@
         transition: var(--transition);
     }
 
-    .price-card .price-change-badge .badge.positive {
-        background: rgba(46, 204, 113, 0.2) !important;
-        color: var(--accent-green) !important;
-    }
+        .price-card .price-change-badge .badge.positive {
+            background: rgba(46, 204, 113, 0.2) !important;
+            color: var(--accent-green) !important;
+        }
 
-    .price-card .price-change-badge .badge.negative {
-        background: rgba(231, 76, 60, 0.2) !important;
-        color: var(--accent-red) !important;
-    }
+        .price-card .price-change-badge .badge.negative {
+            background: rgba(231, 76, 60, 0.2) !important;
+            color: var(--accent-red) !important;
+        }
 
     .price-card .price-change-dollar {
         font-weight: 500;
@@ -528,15 +552,24 @@
         color: var(--text-muted);
     }
 
-    /* Price update flash animation */
     keyframes price-flash-up {
-        0% { background: rgba(46, 204, 113, 0.15); }
-        100% { background: transparent; }
+        0% {
+            background: rgba(46, 204, 113, 0.15);
+        }
+
+        100% {
+            background: transparent;
+        }
     }
 
     keyframes price-flash-down {
-        0% { background: rgba(231, 76, 60, 0.15); }
-        100% { background: transparent; }
+        0% {
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        100% {
+            background: transparent;
+        }
     }
 
     .price-card.flash-up {
@@ -556,11 +589,11 @@
         cursor: pointer;
     }
 
-    .trade-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(79, 140, 247, 0.3);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
+        .trade-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(79, 140, 247, 0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
 
     [data-bs-theme="light"] .trade-card:hover {
         box-shadow: 0 12px 40px rgba(0,0,0,0.12);
@@ -579,9 +612,9 @@
         background: var(--bg-secondary);
     }
 
-    .trade-screenshot img {
-        transition: var(--transition);
-    }
+        .trade-screenshot img {
+            transition: var(--transition);
+        }
 
     .trade-card:hover .trade-screenshot img {
         transform: scale(1.02);
@@ -603,15 +636,15 @@
         z-index: 10;
     }
 
-    .action-btn:hover {
-        background: rgba(79, 140, 247, 0.1);
-        color: var(--accent-blue);
-    }
+        .action-btn:hover {
+            background: rgba(79, 140, 247, 0.1);
+            color: var(--accent-blue);
+        }
 
-    .action-btn.danger:hover {
-        background: rgba(231, 76, 60, 0.1);
-        color: var(--accent-red);
-    }
+        .action-btn.danger:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent-red);
+        }
 </style>
 
 @section scripts {
@@ -622,7 +655,7 @@
             $('#tradeModalContent').html(`
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">Loading form...</span>
                     </div>
                     <p class="text-muted mt-3">Loading form...</p>
                 </div>
@@ -687,15 +720,21 @@
             var form = $(this);
             var formData = new FormData(this);
 
-            var symbol = $('select[name="Trade.Symbol"]').val();
-            var direction = $('input[name="Trade.Direction"]:checked').val();
-            var entry = $('input[name="Trade.EntryPrice"]').val();
-            var exit = $('input[name="Trade.ExitPrice"]').val();
+            // If the Symbol dropdown doesn't exist on the page, it's an MT5 trade (locked form)
+            var isMT5 = $('select[name="Trade.Symbol"]').length === 0;
 
-            if (!symbol) { alert('Please select a Symbol.'); return false; }
-            if (!direction) { alert('Please select a Direction.'); return false; }
-            if (!entry || parseFloat(entry) <= 0) { alert('Please enter a valid Entry Price.'); return false; }
-            if (!exit || parseFloat(exit) <= 0) { alert('Please enter a valid Exit Price.'); return false; }
+            // ONLY validate if it's a manual trade
+            if (!isMT5) {
+                var symbol = $('select[name="Trade.Symbol"]').val();
+                var direction = $('input[name="Trade.Direction"]:checked').val();
+                var entry = $('input[name="Trade.EntryPrice"]').val();
+                var exit = $('input[name="Trade.ExitPrice"]').val();
+
+                if (!symbol) { alert('Please select a Symbol.'); return false; }
+                if (!direction) { alert('Please select a Direction.'); return false; }
+                if (!entry || parseFloat(entry) <= 0) { alert('Please enter a valid Entry Price.'); return false; }
+                if (!exit || parseFloat(exit) <= 0) { alert('Please enter a valid Exit Price.'); return false; }
+            }
 
             isSubmitting = true;
 

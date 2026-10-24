@@ -27,7 +27,10 @@ namespace J7Journal.Data
             modelBuilder.Entity<TradeEntry>()
                 .Property(e => e.ExitPrice)
                 .HasPrecision(18, 4);
-
+            modelBuilder.Entity<TradeEntry>()
+    .HasIndex(t => t.MT5Ticket)
+    .IsUnique()
+    .HasName("IX_TradeEntries_MT5Ticket");
             base.OnModelCreating(modelBuilder);
         }
     }

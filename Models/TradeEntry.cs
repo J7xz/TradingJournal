@@ -47,6 +47,15 @@ namespace J7Journal.Models
 
         public virtual ICollection<TradeTag> TradeTags { get; set; }
 
+        // ============ MT5 AUTO-SYNC FIELDS ============
+        public long? MT5Ticket { get; set; }
+        public decimal? Volume { get; set; }
+        public DateTime? MT5OpenTime { get; set; }
+        public DateTime? MT5CloseTime { get; set; }
+        public bool ImportedFromMT5 { get; set; }
+        public bool IsJournalComplete { get; set; }
+        // ============ END MT5 AUTO-SYNC FIELDS ============
+
         public TradeEntry()
         {
             TradeDate = DateTime.Now;

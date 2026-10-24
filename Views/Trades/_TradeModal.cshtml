@@ -35,6 +35,24 @@
     <!-- Modal Body -->
     <div class="modal-body">
 
+        <!-- MT5 Import Info -->
+        @if (trade.ImportedFromMT5)
+        {
+            <div class="alert alert-success d-flex align-items-center mb-4" style="background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.3); color: var(--accent-green);">
+                <i class="fas fa-check-circle me-2 fs-5"></i>
+                <div>
+                    <strong>Imported from MT5</strong>
+                    <div style="font-size: 0.8rem; opacity: 0.8;">
+                        Ticket: @trade.MT5Ticket | Volume: @trade.Volume lots
+                        @if (!trade.IsJournalComplete)
+                        {
+                            <span class="badge bg-warning text-dark ms-2">Needs Notes</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
         <!-- Screenshot Hero -->
         @if (trade.ScreenshotData != null && trade.ScreenshotData.Length > 0)
         {
@@ -175,7 +193,7 @@
                 </div>
             </div>
 
-            <!-- Confluences -->
+            <!-- CONFLUENCES (Added here!) -->
             @if (!string.IsNullOrEmpty(trade.Confluences))
             {
                 <div class="col-12">
@@ -186,7 +204,7 @@
                         <div class="d-flex flex-wrap gap-1 mt-1">
                             @foreach (var c in trade.Confluences.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                             {
-                                <span class="badge" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.2rem 0.7rem; border-radius: 20px; font-weight: 400;">
+                                <span class="badge" style="background: var(--bg-card); border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 500;">
                                     @c.Trim()
                                 </span>
                             }
@@ -234,7 +252,7 @@
                     {
                         <span class="mx-2">|</span>
                         <i class="fas fa-edit me-1"></i>
-                    Updated: @trade.UpdatedAt.ToString("MMM d, yyyy • h:mm tt");
+                        <span>Updated: @trade.UpdatedAt.ToString("MMM d, yyyy • h:mm tt")</span>
                     }
                 </div>
             </div>
@@ -246,44 +264,43 @@
         <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">
             <i class="fas fa-times me-2"></i>Close
         </button>
-        <button type="button" class="btn btn-outline-secondary" onclick="editTrade(@trade.Id); $('#tradeModal').modal('hide');">
+
+        <button type="button" class="btn btn-outline-secondary" onclick="editTrade(@trade.Id);">
             <i class="fas fa-pen me-2"></i>Edit
         </button>
-        <button type="button" class="btn btn-danger" onclick="deleteTrade(@trade.Id); $('#tradeModal').modal('hide');">
+
+        <button type="button" class="btn btn-danger" onclick="deleteTrade(@trade.Id);">
             <i class="fas fa-trash-alt me-2"></i>Delete
         </button>
     </div>
 </div>
 
 <script>
-    // Re-define functions if needed
-    if (typeof editTrade === 'undefined') {
-        window.editTrade = function(id) {
-            $.get('@Url.Action("Edit", "Trades")?id=' + id, function(data) {
-                $('#tradeModalContent').html(data);
-                $('#tradeModal').modal('show');
+    // Fix for the Edit button inside the modal
+    window.editTrade = function(id) {
+        $('#tradeModalContent').html(`
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading edit form...</span>
+                </div>
+                <p class="text-muted mt-3">Loading edit form...</p>
+            </div>
+        `);
+
+        $.get('@Url.Action("Edit", "Trades")?id=' + id, function(data) {
+            $('#tradeModalContent').html(data);
+        });
+    };
+
+    window.deleteTrade = function(id) {
+        if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
+            $.post('@Url.Action("Delete", "Trades")?id=' + id, function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting trade. Please try again.');
+                }
             });
-        };
-    }
-
-    if (typeof deleteTrade === 'undefined') {
-        window.deleteTrade = function(id) {
-            if (confirm('Are you sure you want to delete this trade? This action cannot be undone.')) {
-                $.post('@Url.Action("Delete", "Trades")?id=' + id, function(response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting trade. Please try again.');
-                    }
-                });
-            }
-        };
-    }
-
-    // Close modal on ESC
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Escape') {
-            $('#tradeModal').modal('hide');
         }
-    });
+    };
 </script>
