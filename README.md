@@ -18,7 +18,8 @@ A professional trading journal web application for traders of Gold, NASDAQ, and 
 
 ### 🤖 MT5 Auto-Sync
 - Trades closed in MetaTrader 5 automatically appear in the journal
-- Custom MQL5 Expert Advisor (EA) detects closed positions and sends data via HTTP POST
+- Custom MQL5 Expert Advisor (EA) detects closed positions and generates JSON payloads
+- Uses a Windows File-Watcher bridge to bypass MT5's strict `localhost` WebRequest firewall block
 - Unique ticket number validation prevents duplicate imports
 - Imported trades are locked (execution data cannot be edited) to maintain data integrity
 - Visual "✅ Imported from MT5" badge on the dashboard
@@ -61,12 +62,12 @@ A professional trading journal web application for traders of Gold, NASDAQ, and 
 |----------|------------|
 | Backend | ASP.NET MVC 5 (.NET Framework 4.7.2) |
 | API | ASP.NET Web API 2 |
-| ORM | Entity Framework 6 (Code First Migrations) |
+| ORM | Entity Framework 6 (Code First) |
 | Database | SQL Server |
 | Real-Time | SignalR |
 | Frontend | Bootstrap 5, Font Awesome 6 |
 | Charts | Chart.js |
-| API | Finnhub (Prices), MT5 WebRequest (Trades) |
+| APIs | Finnhub (Prices), MT5 EA (Trades) |
 
 ---
 
